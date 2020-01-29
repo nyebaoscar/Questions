@@ -36,7 +36,9 @@ def register():
         hashed_password = generate_password_hash(request.form['password'], method='sha256')
         db.execute('insert into users (name, password, expert, admin) values(?,?,?,?)',[request.form['name'], hashed_password, '0', '0'])
         db.commit()
-        return '<h1>User Created</h1>'
+        
+        session['user'] = request.form['name']
+        return redirect (url_for('index'))
     
     return render_template('register.html', user=user)
 
@@ -54,7 +56,7 @@ def login():
         
         if check_password_hash(user_result['password'], password):
             session['user'] = user_result['name']
-            return '<h1>The password is correct!</h1>'
+            return redirect (url_for('index'))
         else:
             return '<h1>The password is incorrect!</h1>'
     
