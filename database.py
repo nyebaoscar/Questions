@@ -10,7 +10,7 @@ def connect_db():
     return conn, sql
 
 def get_db():
-    db = connect()
+    db = connect_db()
     
     if not hasattr(g, 'postgres_db_conn'):
         g.postgres_db_conn = db[0]
@@ -19,3 +19,18 @@ def get_db():
         g.postgres_db_cur = db[1]
 
     return g.postgres_db_cur
+
+def init_db():
+    db = connect_db()
+    
+    db[1].execute(open('schema.sql', 'r').read())
+    db[1].close()
+    
+    db[0].close()
+
+def init_admin():
+    db = connect_db()
+    
+    db[1].execute('update users set admin = True where name = %s', ('admin', ))
+    db[1].close()
+    db[0].close()
